@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Scented Satchel | Premium Perfumes & Handbags</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;500;700&family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#7C3AED',
+                        secondary: '#10B981',
+                        dark: '#1F2937',
+                        light: '#F9FAFB',
+                        accent: '#F59E0B'
+                    },
+                    fontFamily: {
+                        serif: ['Playfair Display', 'serif'],
+                        sans: ['Poppins', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .hero-section {
+            background-image: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), url('https://placehold.co/1920x1080');
+            background-size: cover;
+            background-position: center;
+        }
+        .product-card:hover .product-image {
+            transform: scale(1.03);
+            transition: transform 0.3s ease;
+        }
+        .category-toggle.active {
+            border-bottom: 3px solid #7C3AED;
+        }
+        .cart-item-enter {
+            opacity: 0;
+            transform: translateX(-20px);
+        }
+        .cart-item-enter-active {
+            opacity: 1;
+            transform: translateX(0);
+            transition: opacity 300ms, transform 300ms;
+        }
+        .cart-item-exit {
+            opacity: 1;
+        }
+        .cart-item-exit-active {
+            opacity: 0;
+            transform: translateX(20px);
+            transition: opacity 300ms, transform 300ms;
+        }
+        /* Animation for cart items */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .cart-item {
+            animation: fadeIn 0.3s ease-out;
+        }
+    </style>
+</head>
+<body class="font-sans bg-light">
+    <!-- Fake Backend Simulation -->
+    <script>
+        // Database simulation
+        const database = {
+            users: [
+                { id: 'u1', email: 'hairunnisha204@gmail.com', password: 'nisha123', name: 'Admin User' }
+            ],
+            products: [],
+            orders: [],
+            currentUser: null
+        };
+
+        // Product data
+        const initialProducts = [
+            // Perfumes
+            {
+                id: 'p1',
+                name: 'Midnight Elixir',
+                category: 'perfume',
+                price: 89.99,
+                description: 'A captivating fragrance with notes of amber, vanilla, and oud wood. Perfect for evening wear.',
+                image: 'https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcR6LdgO3NblJDYdAXWZWoywZxYUffIVkSDGwBimi3MEqt0XpHBfKpwp_RWIErwGOas3KwXsOQER',
+                alt: 'Elegant dark glass perfume bottle with gold accents on marble surface',
+                stock: 15,
+                featured: true
+            },
+            {
+                id: 'p2',
+                name: 'Solar Bloom',
+                category: 'perfume',
+                price: 75.50,
+                description: 'Fresh and floral with top notes of bergamot, jasmine, and white musk. Ideal for daytime.',
+                image: 'https://www.sephora.com/productimages/sku/s2186625-av-17-zoom.jpg',
+                alt: 'Chic minimalist perfume bottle with pale pink liquid in natural sunlight',
+                stock: 22,
+                featured: true
+            },
+            {
+                id: 'p3',
+                name: 'Woodsy Amber',
+                category: 'perfume',
+                price: 95.00,
+                description: 'Warm and woody fragrance with sandalwood, patchouli, and subtle spice notes.',
+                image: 'https://www.clivechristian.com/cdn/shop/files/Clive-Christian-18_jgd_1000x5000.jpg?v=1709908889',
+                alt: 'Luxury amber-colored perfume bottle with wooden cap on rustic table',
+                stock: 10,
+                featured: false
+            },
+            // Bags
+            {
+                id: 'b1',
+                name: 'Urban Crossbody',
+                category: 'bag',
+                price: 129.99,
+                description: 'Compact yet spacious crossbody bag with multiple compartments. Perfect for everyday essentials.',
+                image: 'https://encrypted-tbn1.gstatic.com/shopping?q=tbn:ANd9GcQ1gefdXm45SZ90zfTiB3Q8a-nC90mHqC8kJ5vK5UyLUuLlOsBLtj6OPQrA6NivKFbtoyPr6z15Qg',
+                alt: 'Black leather crossbody bag with gold hardware laid flat for display',
+                stock: 8,
+                featured: true
+            },
+            {
+                id: 'b2',
+                name: 'Evening Clutch',
+                category: 'bag',
+                price: 89.50,
+                description: 'Elegant evening clutch with rhinestone embellishments. Fits phone and essentials.',
+                image: 'https://encrypted-tbn2.gstatic.com/shopping?q=tbn:ANd9GcTV4I-x67H6wm4jZ3xt50s7zzcAUDfIZBPUsyDW1O0SE2NQdMs',
+                alt: 'Silver metallic clutch bag with crystal detailing against dark background',
+                stock: 12,
+                featured: true
+            },
+            {
+                id: 'b3',
+                name: 'Weekend Tote',
+                category: 'bag',
+                price: 145.00,
+                description: 'Spacious canvas tote with leather trim. Ideal for weekend getaways or daily use.',
+                image: 'https://encrypted-tbn3.gstatic.com/shopping?q=tbn:ANd9GcQLaBukZzhy0jlcqnakTFn6zAxo9Tu1Fw1Bua803KBVXquFV9K0mjNPzYvj9GVUOSpP8HIkrAey',
+                alt: 'Beige canvas tote bag with brown leather handles on wooden bench',
+                stock: 5,
+                featured: false
+            }
+        ];
+
+        // Initialize products
+        database.products = initialProducts;
+
+        // Shopping cart in localStorage
+        if (!localStorage.getItem('cart')) {
+            localStorage.setItem('cart', JSON.stringify([]));
+        }
+
+        // Search history
+        if (!localStorage.getItem('searchHistory')) {
+            localStorage.setItem('searchHistory', JSON.stringify([]));
+        }
+
+        // API simulation functions
+        const api = {
+            // Product endpoints
+            getProducts: (category = 'all', searchTerm = '') => {
+                let products = initialProducts;
+                if (category !== 'all') {
+                    products = products.filter(p => p.category === category);
+                }
+                if (searchTerm) {
+                    const term = searchTerm.toLowerCase();
+                    products = products.filter(p => 
+                        p.name.toLowerCase().includes(term) || 
+                        p.description.toLowerCase().includes(term)
+                    );
+                }
+                return products;
+            },
+            getFeaturedProducts: () => {
+                return initialProducts.filter(p => p.featured);
+            },
+            getProduct: (id) => {
+                return initialProducts.find(p => p.id === id);
+            },
+
+            // Cart endpoints
+            addToCart: (productId, quantity = 1) => {
+                const cart = JSON.parse(localStorage.getItem('cart'));
+                const existingItem = cart.find(item => item.productId === productId);
+                
+                if (existingItem) {
+                    existingItem.quantity += quantity;
+                } else {
+                    cart.push({ productId, quantity });
+                }
+                
+                localStorage.setItem('cart', JSON.stringify(cart));
+                return cart;
+            },
+            removeFromCart: (productId) => {
+                const cart = JSON.parse(localStorage.getItem('cart'));
+                const newCart = cart.filter(item => item.productId !== productId);
+                localStorage.setItem('cart', JSON.stringify(newCart));
+                return newCart;
+            },
+            updateCartItem: (productId, quantity) => {
+                const cart = JSON.parse(localStorage.getItem('cart'));
+                const item = cart.find(item => item.productId === productId);
+                
+                if (item) {
+                    if (quantity <= 0) {
+                        return api.removeFromCart(productId);
+                    }
+                    item.quantity = quantity;
+                }
+                
+                localStorage.setItem('cart', JSON.stringify(cart));
+                return cart;
+            },
+            clearCart: () => {
+                localStorage.setItem('cart', JSON.stringify([]));
+                return [];
+            },
+            getCart: () => {
+                const cart = JSON.parse(localStorage.getItem('cart'));
+                return cart.map(item => {
+                    const product = api.getProduct(item.productId);
+                    return { ...item, product };
+                }).filter(item => item.product); // Filter out invalid items
+            },
+            getCartCount: () => {
+                const cart = JSON.parse(localStorage.getItem('cart'));
+                if (!cart) return 0;
+                return cart.reduce((sum, item) => sum + item.quantity, 0);
+            },
+            getCartTotal: () => {
+                const cart = api.getCart();
+                return cart.reduce((sum, item) => sum + (item.product.price * item.quantity), 0);
+            },
+
+            // User endpoints
+            register: (email, password, name) => {
+                const existingUser = database.users.find(u => u.email === email);
+                if (existingUser) {
+                    return { error: 'Email already registered' };
+                }
+                
+                const user = { id: `u${database.users.length + 1}`, email, password, name };
+                database.users.push(user);
+                database.currentUser = user;
+                return user;
+            },
+            login: (email, password) => {
+                const user = database.users.find(u => u.email === email && u.password === password);
+                if (user) database.currentUser = user;
+                return user;
+            },
+            logout: () => {
+                database.currentUser = null;
+                return true;
+            },
+            getCurrentUser: () => {
+                return database.currentUser;
+            },
+
+            // Search endpoints
+            addSearchTerm: (term) => {
+                if (!term) return;
+                const history = JSON.parse(localStorage.getItem('searchHistory'));
+                if (!history.includes(term.toLowerCase())) {
+                    history.push(term.toLowerCase());
+                    localStorage.setItem('searchHistory', JSON.stringify(history));
+                }
+            },
+            getSearchHistory: () => {
+                return JSON.parse(localStorage.getItem('searchHistory'));
+            },
+
+            // Order endpoints
+            createOrder: (items, total, user) => {
+                const order = {
+                    id: `ord-${database.orders.length + 1}`,
+                    date: new Date().toISOString(),
+                    items,
+                    total,
+                    userId: user?.id || null,
+                    status: 'completed'
+                };
+                database.orders.push(order);
+                return order;
+            }
+        };
+    </script>
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-md py-4 px-5 flex items-center justify-between sticky top-0 z-50">
+        <div class="flex items-center space-x-4">
+            <h1 class="text-2xl font-serif font-bold text-primary">The Scented Satchel | Demand for Aura</h1>
+        </div>
+        
+        <div class="hidden md:flex items-center space-x-8">
+            <div class="relative">
+                <input type="text" id="search-input" placeholder="Search products..." 
+                       class="px-9 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary w-64" />
+                <div id="search-results" class="absolute top-full left-100 w-full bg-white shadow-lg mt-1 rounded-md hidden z-10"></div>
+            </div>
+            <!-- <a href="#perfumes" class="text-dark hover:text-primary font-medium">Perfumes</a>
+            <a href="#bags" class="text-dark hover:text-primary font-medium">Bags</a> -->
+        </div>
+        
+        <div class="flex items-center space-x-4">
+            <button onclick="toggleCart()" class="relative">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                <span id="cart-count" class="absolute -top-2 -right-2 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">0</span>
+            </button>
+            <button onclick="toggleAuthModal()" id="auth-button" class="bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition">
+                <span id="auth-button-text">Login</span>
+            </button>
+            <button class="md:hidden" onclick="toggleMobileMenu()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white shadow-lg absolute w-full z-40 py-4 px-6">
+        <div class="flex flex-col space-y-4">
+            <div class="relative">
+                <input type="text" id="mobile-search-input" placeholder="Search products..." 
+                       class="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary w-full" />
+                <div id="mobile-search-results" class="absolute top-full left-0 w-full bg-white shadow-lg mt-1 rounded-md hidden z-10"></div>
+            </div>
+            <a href="#perfumes" class="text-dark hover:text-primary font-medium" onclick="toggleMobileMenu()">Perfumes</a>
+            <a href="#bags" class="text-dark hover:text-primary font-medium" onclick="toggleMobileMenu()">Bags</a>
+        </div>
+    </div>
+
+    <!-- Hero Section -->
+    <section class="hero-section text-white py-24 px-6 md:py-32 md:px-12">
+        <div class="max-w-4xl mx-auto text-center">
+            <h1 class="text-4xl md:text-6xl font-serif font-bold mb-4">Discover Luxury Fragrances & Accessories</h1>
+            <p class="text-xl mb-8">Indulge in our curated collection of exquisite perfumes and handcrafted bags</p>
+            <div class="flex flex-col md:flex-row justify-center space-y-4 md:space-y-0 md:space-x-4">
+               <!-- <a href="#perfumes" class="bg-primary text-white px-6 py-3 rounded-md hover:bg-opacity-90 transition font-medium">Shop Perfumes</a>
+                <a href="#bags" class="bg-white text-dark px-6 py-3 rounded-md hover:bg-opacity-90 transition font-medium">Shop Bags</a> -->
+                
+            </div>
+        </div>
+    </section>
+
+    <!-- Featured Products -->
+    <section class="py-12 px-6 md:px-12 bg-white">
+        <div class="max-w-7xl mx-auto">
+            <h2 class="text-3xl font-serif font-bold text-center mb-12">Featured Collection</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" id="featured-products">
+                <!-- Featured products will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Category Navigation -->
+    <div class="sticky top-16 md:top-20 bg-white shadow-sm z-30">
+        <div class="max-w-7xl mx-auto px-6">
+            <div class="flex space-x-8 overflow-x-auto py-4">
+                <button onclick="filterProducts('all')" class="text-lg font-medium whitespace-nowrap category-toggle active">All Products</button>
+                <button onclick="filterProducts('perfume')" class="text-lg font-medium whitespace-nowrap category-toggle">Perfumes</button>
+                <button onclick="filterProducts('bag')" class="text-lg font-medium whitespace-nowrap category-toggle">Bags & Accessories</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- All Products -->
+    <section class="py-12 px-6 md:px-12 bg-light">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8" id="products-container">
+                <!-- All products will be inserted here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-12 px-6">
+        <div class="max-w-7xl mx-auto text-center">
+            <p>© 2023 The Scented Satchel. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Shopping Cart Sidebar -->
+    <div id="cart-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden" onclick="toggleCart()"></div>
+    <div id="cart-sidebar" class="fixed top-0 right-0 w-full md:w-1/2 lg:w-1/3 h-full bg-white z-50 transform translate-x-full transition-transform duration-300 overflow-y-auto">
+        <div class="p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-serif font-bold">Your Cart</h2>
+                <button onclick="toggleCart()" class="text-gray-500 hover:text-dark">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="cart-items">
+                <!-- Cart items will be inserted here by JavaScript -->
+            </div>
+            
+            <div class="border-t border-gray-200 pt-4 mt-4">
+                <div class="flex justify-between mb-2">
+                    <span class="font-medium">Subtotal</span>
+                    <span id="cart-subtotal" class="font-bold">$0.00</span>
+                </div>
+                <div class="flex justify-between mb-4">
+                    <span class="font-medium">Shipping</span>
+                    <span class="text-gray-700">Calculated at checkout</span>
+                </div>
+                <div class="flex justify-between text-lg font-bold">
+                    <span>Total</span>
+                    <span id="cart-total">$0.00</span>
+                </div>
+                <button onclick="checkout()" id="checkout-button" class="w-full bg-primary text-white py-3 rounded-md mt-6 hover:bg-opacity-90 transition">Proceed to Checkout</button>
+                <button onclick="toggleCart()" class="w-full border border-gray-300 text-dark py-3 rounded-md mt-2 hover:bg-gray-100 transition">Continue Shopping</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Authentication Modal -->
+    <div id="auth-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg w-full max-w-md p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-serif font-bold" id="auth-modal-title">Login</h2>
+                <button onclick="toggleAuthModal()" class="text-gray-500 hover:text-dark">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div id="login-form">
+                <form onsubmit="handleLogin(event)" class="space-y-4">
+                    <div id="login-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
+                    <div>
+                        <label for="login-email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <input type="email" id="login-email" required class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div>
+                        <label for="login-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="login-password" required class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <button type="submit" class="w-full bg-primary text-white py-3 rounded-md hover:bg-opacity-90 transition">Login</button>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600">Don't have an account? <button type="button" onclick="toggleAuthForm()" class="text-primary font-medium">Register here</button></p>
+                    </div>
+                </form>
+            </div>
+            
+            <div id="register-form" class="hidden">
+                <form onsubmit="handleRegister(event)" class="space-y-4">
+                    <div id="register-error" class="hidden bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4"></div>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="register-first-name" class="block text-sm font-medium text-gray-700 mb-1">First Name</label>
+                            <input type="text" id="register-first-name" required class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary" />
+                        </div>
+                        <div>
+                            <label for="register-last-name" class="block text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                            <input type="text" id="register-last-name" class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary" />
+                        </div>
+                    </div>
+                    <div>
+                        <label for="register-email" class="block text-sm font-medium text-gray-700 mb-1">Email Address</label>
+                        <input type="email" id="register-email" required class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div>
+                        <label for="register-password" class="block text-sm font-medium text-gray-700 mb-1">Password</label>
+                        <input type="password" id="register-password" required class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <div>
+                        <label for="register-confirm-password" class="block text-sm font-medium text-gray-700 mb-1">Confirm Password</label>
+                        <input type="password" id="register-confirm-password" required class="w-full px-4 py-3 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-primary" />
+                    </div>
+                    <button type="submit" class="w-full bg-primary text-white py-3 rounded-md hover:bg-opacity-90 transition">Register</button>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600">Already have an account? <button type="button" onclick="toggleAuthForm()" class="text-primary font-medium">Login here</button></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Modal -->
+    <div id="product-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg w-full max-w-4xl p-6">
+            <div class="flex justify-between items-center mb-6">
+                <h2 id="product-modal-title" class="text-2xl font-serif font-bold">Product Details</h2>
+                <button onclick="toggleProductModal()" class="text-gray-500 hover:text-dark">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <div class="md:flex md:space-x-8">
+                <div class="md:w-1/2 mb-6 md:mb-0">
+                    <img id="product-modal-image" src="https://placehold.co/600x800" alt="Product image" class="w-full rounded-lg shadow-md" />
+                </div>
+                
+                <div class="md:w-1/2">
+                    <h3 id="product-modal-name" class="text-2xl font-bold mb-2"></h3>
+                    <div class="flex items-center mb-4">
+                        <div class="flex text-yellow-400">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                        </div>
+                        <span class="text-lg font-bold text-dark ml-2">$<span id="product-modal-price"></span></span>
+                    </div>
+                    <p id="product-modal-description" class="text-gray-700 mb-4"></p>
+                    <div class="flex items-center">
+                        <input type="number" id="product-modal-quantity" min="1" value="1" class="w-16 border border-gray-300 rounded-md px-2 py-1" />
+                        <button onclick="addToCartFromModal()" class="ml-4 bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition">Add to Cart</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Success Modal -->
+    <div id="checkout-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg w-full max-w-md p-6 text-center">
+            <div class="mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-16 w-16 text-green-500 mx-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h2 class="text-2xl font-serif font-bold mb-4">Order Confirmed!</h2>
+            <p class="text-gray-700 mb-6">Thank you for your purchase. Your order has been placed successfully.</p>
+            <button onclick="closeCheckoutModal()" class="bg-primary text-white px-6 py-2 rounded-md hover:bg-opacity-90 transition">Continue Shopping</button>
+        </div>
+    </div>
+
+    <!-- Main Application Script -->
+    <script>
+        // Current state
+        let currentProductId = null;
+        let currentCategory = 'all';
+        let currentSearchTerm = '';
+
+        // DOM Elements
+        const searchInput = document.getElementById('search-input');
+        const searchResults = document.getElementById('search-results');
+        const mobileSearchInput = document.getElementById('mobile-search-input');
+        const mobileSearchResults = document.getElementById('mobile-search-results');
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            displayFeaturedProducts();
+            filterProducts('all');
+            updateCartCount();
+            updateAuthButton();
+
+            // Search functionality
+            searchInput.addEventListener('input', handleSearch);
+            mobileSearchInput.addEventListener('input', handleMobileSearch);
+        });
+
+        // Display featured products
+        function displayFeaturedProducts() {
+            const featuredProducts = api.getFeaturedProducts();
+            const featuredContainer = document.getElementById('featured-products');
+            featuredContainer.innerHTML = '';
+            
+            featuredProducts.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card bg-white shadow-md rounded-lg overflow-hidden';
+                productCard.innerHTML = `
+                    <div class="relative">
+                        <img src="${product.image}" alt="${product.alt}" class="w-full h-64 object-cover product-image" />
+                        ${product.featured ? 
+                          '<span class="absolute top-2 right-2 bg-accent text-white text-xs font-bold px-2 py-1 rounded">Featured</span>' : ''}
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold">${product.name}</h3>
+                        <p class="text-gray-600">$${product.price.toFixed(2)}</p>
+                        <button onclick="showProductModal('${product.id}')" 
+                                class="mt-2 bg-primary text-white px-4 py-2 rounded-md hover:bg-opacity-90 transition w-full">
+                            View Details
+                        </button>
+                    </div>
+                `;
+                featuredContainer.appendChild(productCard);
+            });
+        }
+
+        // Filter products by category
+        function filterProducts(category) {
+            currentCategory = category;
+            
+            // Update active category button
+            document.querySelectorAll('.category-toggle').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.textContent.trim() === (category === 'all' ? 'All Products' : 
+                                              category === 'perfume' ? 'Perfumes' : 'Bags & Accessories')) {
+                    btn.classList.add('active');
+                }
+            });
+            
+            // Filter and display products
+            const products = api.getProducts(category, currentSearchTerm);
+            displayProducts(products);
+        }
+
+        // Display products in the main container
+        function displayProducts(products) {
+            const container = document.getElementById('products-container');
+            container.innerHTML = '';
+            
+            if (products.length === 0) {
+                container.innerHTML = '<p class="text-center col-span-full py-12 text-gray-500">No products found matching your criteria.</p>';
+                return;
+            }
+            
+            products.forEach(product => {
+                const productCard = document.createElement('div');
+                productCard.className = 'product-card bg-white shadow-md rounded-lg overflow-hidden';
+                productCard.innerHTML = `
+                    <div class="relative">
+                        <img src="${product.image}" alt="${product.alt}" class="w-full h-64 object-cover product-image" />
+                        ${product.stock < 5 ? 
+                          '<span class="absolute top-2 right-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded">Low Stock</span>' : ''}
+                    </div>
+                    <div class="p-4">
+                        <h3 class="text-lg font-bold">${product.name}</h3>
+                        <p class="text-gray-600">$${product.price.toFixed(2)}</p>
+                        <div class="flex space-x-2 mt-2">
+                            <button onclick="showProductModal('${product.id}')" 
+                                    class="flex-1 bg-gray-200 text-dark px-3 py-2 rounded-md hover:bg-gray-300 transition">
+                                Details
+                            </button>
+                            <button onclick="addToCart('${product.id}')" 
+                                    class="flex-1 bg-primary text-white px-3 py-2 rounded-md hover:bg-opacity-90 transition">
+                                Add to Cart
+                            </button>
+                        </div>
+                    </div>
+                `;
+                container.appendChild(productCard);
+            });
+        }
+
+        // Search functionality
+        function handleSearch() {
+            const term = searchInput.value.trim();
+            if (term.length > 0) {
+                const results = api.getProducts(currentCategory, term).slice(0, 5);
+                displaySearchResults(results, searchResults);
+            } else {
+                searchResults.classList.add('hidden');
+            }
+        }
+
+        function handleMobileSearch() {
+            const term = mobileSearchInput.value.trim();
+            if (term.length > 0) {
+                const results = api.getProducts(currentCategory, term).slice(0, 5);
+                displaySearchResults(results, mobileSearchResults);
+            } else {
+                mobileSearchResults.classList.add('hidden');
+            }
+        }
+
+        function displaySearchResults(results, container) {
+            container.innerHTML = '';
+            
+            if (results.length > 0) {
+                results.forEach(product => {
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'p-3 hover:bg-gray-100 cursor-pointer border-b';
+                    resultItem.innerHTML = `
+                        <div class="flex items-center">
+                            <img src="${product.image}" alt="${product.name}" class="w-10 h-10 object-cover rounded mr-3">
+                            <div>
+                                <h4 class="font-medium">${product.name}</h4>
+                                <p class="text-sm text-gray-600">$${product.price.toFixed(2)}</p>
+                            </div>
+                        </div>
+                    `;
+                    resultItem.onclick = () => {
+                        showProductModal(product.id);
+                        container.classList.add('hidden');
+                    };
+                    container.appendChild(resultItem);
+                });
+                container.classList.remove('hidden');
+            } else {
+                container.innerHTML = '<div class="p-3 text-gray-500">No products found</div>';
+                container.classList.remove('hidden');
+            }
+        }
+
+        // Product modal functions
+        function showProductModal(productId) {
+            const product = api.getProduct(productId);
+            if (!product) return;
+            
+            currentProductId = productId;
+            document.getElementById('product-modal-title').textContent = product.name;
+            document.getElementById('product-modal-image').src = product.image;
+            document.getElementById('product-modal-image').alt = product.alt;
+            document.getElementById('product-modal-name').textContent = product.name;
+            document.getElementById('product-modal-price').textContent = product.price.toFixed(2);
+            document.getElementById('product-modal-description').textContent = product.description;
+            document.getElementById('product-modal-quantity').value = 1;
+            
+            toggleProductModal();
+        }
+
+        function toggleProductModal() {
+            document.getElementById('product-modal').classList.toggle('hidden');
+        }
+
+        // Cart functions
+        function addToCart(productId, quantity = 1) {
+            const cart = api.addToCart(productId, quantity);
+            updateCart();
+            showToast('Product added to cart');
+        }
+
+        function addToCartFromModal() {
+            const quantity = parseInt(document.getElementById('product-modal-quantity').value);
+            addToCart(currentProductId, quantity);
+            toggleProductModal();
+        }
+
+        function removeFromCart(productId) {
+            api.removeFromCart(productId);
+            updateCart();
+            showToast('Product removed from cart');
+        }
+
+        function updateCartItemQuantity(productId, quantity) {
+            api.updateCartItem(productId, quantity);
+            updateCart();
+        }
+
+        function updateCart() {
+            const cart = api.getCart();
+            const cartItemsContainer = document.getElementById('cart-items');
+            cartItemsContainer.innerHTML = '';
+            
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = '<p class="text-center py-8 text-gray-500">Your cart is empty</p>';
+            } else {
+                cart.forEach(item => {
+                    const cartItem = document.createElement('div');
+                    cartItem.className = 'cart-item flex py-4 border-b';
+                    cartItem.innerHTML = `
+                        <img src="${item.product.image}" alt="${item.product.name}" class="w-16 h-16 object-cover rounded mr-4">
+                        <div class="flex-1">
+                            <h4 class="font-medium">${item.product.name}</h4>
+                            <p class="text-gray-600">$${item.product.price.toFixed(2)}</p>
+                            <div class="flex items-center mt-2">
+                                <button onclick="updateCartItemQuantity('${item.productId}', ${item.quantity - 1})" 
+                                        class="bg-gray-200 px-2 py-1 rounded">
+                                    -
+                                </button>
+                                <span class="mx-2">${item.quantity}</span>
+                                <button onclick="updateCartItemQuantity('${item.productId}', ${item.quantity + 1})" 
+                                        class="bg-gray-200 px-2 py-1 rounded">
+                                    +
+                                </button>
+                            </div>
+                        </div>
+                        <button onclick="removeFromCart('${item.productId}')" 
+                                class="text-red-500 hover:text-red-700 ml-4">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" />
+                            </svg>
+                        </button>
+                    `;
+                    cartItemsContainer.appendChild(cartItem);
+                });
+            }
+            
+            // Update totals
+            document.getElementById('cart-subtotal').textContent = `$${api.getCartTotal().toFixed(2)}`;
+            document.getElementById('cart-total').textContent = `$${api.getCartTotal().toFixed(2)}`;
+            
+            // Update cart count
+            updateCartCount();
+        }
+
+        function updateCartCount() {
+            const count = api.getCartCount();
+            document.getElementById('cart-count').textContent = count;
+        }
+
+        function toggleCart() {
+            document.getElementById('cart-overlay').classList.toggle('hidden');
+            document.getElementById('cart-sidebar').classList.toggle('translate-x-full');
+            
+            if (!document.getElementById('cart-sidebar').classList.contains('translate-x-full')) {
+                updateCart();
+            }
+        }
+
+        // Checkout
+        function checkout() {
+            const cart = api.getCart();
+            if (cart.length === 0) {
+                showToast('Your cart is empty');
+                return;
+            }
+            
+            const user = api.getCurrentUser();
+            const order = api.createOrder(cart, api.getCartTotal(), user);
+            api.clearCart();
+            updateCartCount();
+            toggleCart();
+            showCheckoutModal();
+        }
+
+        function showCheckoutModal() {
+            document.getElementById('checkout-modal').classList.remove('hidden');
+        }
+
+        function closeCheckoutModal() {
+            document.getElementById('checkout-modal').classList.add('hidden');
+        }
+
+        // User authentication
+        function toggleAuthModal() {
+            document.getElementById('auth-modal').classList.toggle('hidden');
+            document.getElementById('login-form').classList.remove('hidden');
+            document.getElementById('register-form').classList.add('hidden');
+            document.getElementById('auth-modal-title').textContent = 'Login';
+        }
+
+        function toggleAuthForm() {
+            const isLogin = document.getElementById('login-form').classList.contains('hidden');
+            document.getElementById('login-form').classList.toggle('hidden');
+            document.getElementById('register-form').classList.toggle('hidden');
+            document.getElementById('auth-modal-title').textContent = isLogin ? 'Login' : 'Register';
+            document.getElementById('login-error').classList.add('hidden');
+            document.getElementById('register-error').classList.add('hidden');
+        }
+
+        function handleLogin(event) {
+            event.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            const user = api.login(email, password);
+            if (user) {
+                showToast('Login successful');
+                toggleAuthModal();
+                updateAuthButton();
+            } else {
+                document.getElementById('login-error').textContent = 'Invalid email or password';
+                document.getElementById('login-error').classList.remove('hidden');
+            }
+        }
+
+        function handleRegister(event) {
+            event.preventDefault();
+            const firstName = document.getElementById('register-first-name').value;
+            const lastName = document.getElementById('register-last-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const confirmPassword = document.getElementById('register-confirm-password').value;
+            
+            if (password !== confirmPassword) {
+                document.getElementById('register-error').textContent = 'Passwords do not match';
+                document.getElementById('register-error').classList.remove('hidden');
+                return;
+            }
+            
+            const result = api.register(email, password, firstName + ' ' + lastName);
+            
+            if (result.error) {
+                document.getElementById('register-error').textContent = result.error;
+                document.getElementById('register-error').classList.remove('hidden');
+            } else {
+                showToast('Registration successful');
+                toggleAuthForm(); // Switch back to login form
+                updateAuthButton();
+            }
+        }
+
+        function logout() {
+            api.logout();
+            updateAuthButton();
+            showToast('Logged out successfully');
+        }
+
+        function updateAuthButton() {
+            const user = api.getCurrentUser();
+            const authButton = document.getElementById('auth-button');
+            const authButtonText = document.getElementById('auth-button-text');
+            
+            if (user) {
+                authButtonText.textContent = user.name.split(' ')[0];
+                authButton.onclick = logout;
+            } else {
+                authButtonText.textContent = 'Login';
+                authButton.onclick = toggleAuthModal;
+            }
+        }
+
+        // Mobile menu
+        function toggleMobileMenu() {
+            document.getElementById('mobile-menu').classList.toggle('hidden');
+        }
+
+        // Toast notifications
+        function showToast(message) {
+            const toast = document.createElement('div');
+            toast.className = 'fixed bottom-4 right-4 bg-dark text-white px-4 py-2 rounded-md shadow-lg animate-fadeIn';
+            toast.textContent = message;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => {
+                toast.classList.add('animate-fadeOut');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        // Initialize animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateY(0); }
+                to { opacity: 0; transform: translateY(-10px); }
+            }
+            .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
+            .animate-fadeOut { animation: fadeOut 0.3s ease-in; }
+        `;
+        document.head.appendChild(style);
+        function sendEmailConfirmation(order) {
+    // Simulate sending an email
+    console.log(`Sending email to ${order.userId}...`);
+    console.log(`Order ID: ${order.id}`);
+    console.log(`Total Amount: $${order.total.toFixed(2)}`);
+    console.log('Email sent successfully!');
+}
+function checkout() {
+    const cart = api.getCart();
+    if (cart.length === 0) {
+        showToast('Your cart is empty');
+        return;
+    }
+    
+    const user = api.getCurrentUser ();
+    const order = api.createOrder(cart, api.getCartTotal(), user);
+    api.clearCart();
+    updateCartCount();
+    toggleCart();
+    showCheckoutModal();
+    
+    // Send email confirmation
+    sendEmailConfirmation(order);
+}
+    </script>
+</body>
+</html>
